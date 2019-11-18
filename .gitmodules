@@ -1,0 +1,9 @@
+[submodule "thirdparty/libusb"]
+	path = thirdparty/libusb
+	url = https://github.com/libusb/libusb.git
+[submodule "thirdparty/yaml-cpp"]
+	path = thirdparty/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
+[submodule "thirdparty/ViGEmClient"]
+	path = thirdparty/ViGEmClient
+	url = https://github.com/ViGEm/ViGEmClient.git
