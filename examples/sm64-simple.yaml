@@ -1,0 +1,73 @@
+# This is example of config that could be used for SM64
+- from: A
+  to: A
+- from: B
+  to: X
+- from: DpadLeft
+  to: DpadLeft
+- from: DpadRight
+  to: DpadRight
+- from: DpadDown
+  to: DpadDown
+- from: DpadUp
+  to: DpadUp
+- from: Start
+  to: Start
+
+# Even though I could have used Y or B, I prefer Z button to be mapped to button not existant on GC controller
+- from: Z
+  to: Back
+
+- from: R
+  to: R
+- from: L
+  to: L
+
+# This is diagonal stretching to emulate N64 controller, read more at https://electromodder.co.uk/
+- type: bilinear
+  # Normal GC Stick has center(127, 127), max(107, 107)
+  # Alter Max values if stick feels too 'short'
+  fromX:
+    center: 127
+    max: 107
+    offset: AnalogX
+  fromY:
+    center: 127
+    max: 107
+    offset: AnalogY
+  toX:
+    center: 0
+    max: 32000
+    offset: LeftX
+  toY:
+    center: 0
+    max: 32000
+    offset: LeftY
+  stretcher:
+    # Stretcher is specified with diagonal value if max values are in [-1.0; 1.0] range
+    # GC uses 'perfect' diagonal sqrt(0.5)=0.70710678118, N64 has it at 70/80=0.875
+    fromDiagonal: 0.70710678118
+    toDiagonal: 0.875
+    # power specified how stick close to (0,0) will behave
+    # the more the value, the more close to original GC mapping stick will behave but further values will stretched heavier to account for accuracy
+    power: 1
+
+# Regular mappings for CStick
+- type: linear
+  from:
+    center: 127
+    max: 100
+    offset: CStickX
+  to:
+    center: 0
+    max: 32000
+    offset: RightX
+- type: linear
+  from:
+    center: 127
+    max: 100
+    offset: CStickY
+  to:
+    center: 0
+    max: 32000
+    offset: RightY

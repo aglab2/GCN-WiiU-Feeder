@@ -1,0 +1,101 @@
+# This is custom config that is used by aglab2 for SM64
+- from: A
+  to: A
+- from: B
+  to: X
+
+# X is mapped to L button which is N64 Z, convenience
+- from: X
+  to: L
+
+- from: DpadLeft
+  to: DpadLeft
+- from: DpadRight
+  to: DpadRight
+- from: DpadDown
+  to: DpadDown
+- from: DpadUp
+  to: DpadUp
+- from: Start
+  to: Start
+
+# Even though I could have used Y or B, I prefer Z button to be mapped to button not existant on GC controller
+- from: Z
+  to: Back
+
+- from: R
+  to: R
+- from: L
+  to: L
+
+# This checks whether trigger is pressed at half to press corresponding R or L button, I find it more convenient :3
+- from:
+    type: axis
+    axis: 120
+    offset: RightTrigger
+    comparer: More
+  to: R
+- from:
+    type: axis
+    axis: 120
+    offset: LeftTrigger
+    comparer: More
+  to: L
+  
+# This is diagonal stretching to emulate N64 controller, read more at https://electromodder.co.uk/
+- type: bilinear
+  # Normal GC Stick has center(127, 127), max(106, 106) but my stick sucks so I have to alter the values
+  # My GC Stick center(126, 134) max(109, 109)
+  fromX:
+    center: 126
+    max: 109
+    offset: AnalogX
+  fromY:
+    center: 134
+    max: 109
+    offset: AnalogY
+  toX:
+    center: 0
+    max: 32000
+    offset: LeftX
+  toY:
+    center: 0
+    max: 32000
+    offset: LeftY
+  stretcher:
+    # Stretcher is specified with diagonal value if max values are in [-1.0; 1.0] range
+    # GC uses 'perfect' diagonal sqrt(0.5)=0.70710678118, N64 has it at 70/80=0.875
+    fromDiagonal: 0.70710678118
+    toDiagonal: 0.875
+    # power specified how stick close to (0,0) will behave
+    # the more the value, the more close to original GC mapping stick will behave but further values will stretched heavier to account for accuracy
+    power: 1
+
+# Regular mappings for CStick, may use similar
+- type: linear
+  from:
+    center: 120
+    max: 100
+    offset: CStickX
+  to:
+    center: 0
+    max: 32000
+    offset: RightX
+- type: linear
+  from:
+    center: 126
+    max: 100
+    offset: CStickY
+  to:
+    center: 0
+    max: 32000
+    offset: RightY
+
+# The Framewalk button :)
+# Make sure to have this mapping place AFTER stick so it would override the normal stick input
+- from: Y
+  to:
+    type: axis
+    axis: 32000
+    offset: LeftY
+    comparer: More
