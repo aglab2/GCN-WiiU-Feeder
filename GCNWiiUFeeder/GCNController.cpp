@@ -55,12 +55,12 @@ namespace YAML
         return Serializer::DecodeBitWise(names, node, thumb);
     }
 
-    Node convert<GCN::IPressablePtr>::encode(const GCN::IPressablePtr& ptr)
+    Node convert<GCN::IEventPtr>::encode(const GCN::IEventPtr& ptr)
     {
         return ptr->Serialize();
     }
 
-    bool convert<GCN::IPressablePtr>::decode(const Node& node, GCN::IPressablePtr& ptr)
+    bool convert<GCN::IEventPtr>::decode(const Node& node, GCN::IEventPtr& ptr)
     {
         if (node.IsScalar() || node.IsSequence())
         {
@@ -80,14 +80,15 @@ namespace YAML
             {
                 auto offsetNode = node["offset"];
                 auto valueNode = node["axis"];
-                //auto comparerNode = node["comparer"];
-                if (!offsetNode || !valueNode)
+                auto comparNode = node["comparer"];
+                if (!offsetNode || !valueNode || !comparNode)
                     return false;
 
                 auto axises = offsetNode.as<GCN::Axises>();
+                auto compar = comparNode.as<ControllerInterface::AxisComparerType>();
                 auto value = (unsigned char) valueNode.as<int>();
 
-                ptr = std::make_shared<GCN::Axis>(axises, value);
+                ptr = std::make_shared<GCN::Axis>(axises, compar, value);
                 return true;
             }
             else
@@ -103,24 +104,15 @@ namespace GCN
 {
     Button::Button(Buttons b) : IButton(b) { }
 
-    void Button::Press(Controller& c) const
-    {
-        Apply(c.Buttons);
-    }
-
-    bool Button::Pressed(const Controller& c) const
+    bool Button::Happened(const Controller& c) const
     {
         return Applied(c.Buttons);
     }
 
-    Axis::Axis(Axises a, unsigned char value) : IAxis(value, ControllerInterface::AxisComparerType::More, a) { }
+    Axis::Axis(Axises a, ControllerInterface::AxisComparerType compar, unsigned char value) 
+        : IAxis(value, compar, a) { }
 
-    void Axis::Press(Controller& c) const
-    {
-        return Apply(&c);
-    }
-
-    bool Axis::Pressed(const Controller& c) const
+    bool Axis::Happened(const Controller& c) const
     {
         return Applied(&c);
     }

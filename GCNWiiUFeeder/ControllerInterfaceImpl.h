@@ -3,19 +3,16 @@
 #include "ControllerInterface.h"
 #include "SerializationImpl.h"
 
-namespace
-{
-    static const std::map<std::string, ControllerInterface::AxisComparerType> axisComparerNames {
-        { "None", ControllerInterface::AxisComparerType::None },
-        { "More", ControllerInterface::AxisComparerType::More },
-        { "Less", ControllerInterface::AxisComparerType::Less },
-    };
-}
-
 namespace ControllerInterface
 {
     template<typename T>
     AxisComparer<T>::AxisComparer(Type t) : type_(t) { }
+
+    template<typename T>
+    YAML::Node AxisComparer<T>::Serialize() const
+    {
+        return YAML::Node(type_);
+    }
 
     template<typename T>
     bool AxisComparer<T>::operator()(const T a, const T b) const
@@ -30,72 +27,76 @@ namespace ControllerInterface
 
         return false;
     }
-    template<typename T>
-    AxisComparer<T>::operator bool() const
-    {
-        return type_ != None;
-    }
-
-    template<typename T>
-    YAML::Node AxisComparer<T>::Serialize() const
-    {
-        return Serialization::EnumSerializer<AxisComparerType>::Encode(axisComparerNames, type_);
-    }
 
     template<typename ButtonT, typename HolderT>
-    ButtonSerializable<ButtonT, HolderT>::ButtonSerializable(ButtonT button) : button_(button) { }
+    Button<ButtonT, HolderT>::Button(ButtonT button) : button_(button) { }
 
     template<typename ButtonT, typename HolderT>
-    YAML::Node ButtonSerializable<ButtonT, HolderT>::Serialize() const
+    YAML::Node Button<ButtonT, HolderT>::Serialize() const
     {
         return YAML::Node(button_);
     }
 
     template<typename ButtonT, typename HolderT>
-    void ButtonSerializable<ButtonT, HolderT>::Apply(HolderT& controller) const
+    void Button<ButtonT, HolderT>::Apply(HolderT& controller) const
     {
         controller |= button_;
     }
 
     template<typename ButtonT, typename HolderT>
-    bool ButtonSerializable<ButtonT, HolderT>::Applied(const HolderT& controller) const
+    bool Button<ButtonT, HolderT>::Applied(const HolderT& controller) const
     {
         return controller & button_;
     }
 
     template<typename AxisT, typename OffsetT>
-    AxisSerializable<AxisT, OffsetT>::AxisSerializable(AxisT axis, AxisComparerType compar, OffsetT offset)
-        : axis_(axis), comparer_(compar), offset_(offset) { }
+    Axis<AxisT, OffsetT>::Axis(AxisT axis, OffsetT offset) : axis_(axis), offset_(offset) { }
 
     template<typename AxisT, typename OffsetT>
-    YAML::Node AxisSerializable<AxisT, OffsetT>::Serialize() const
+    YAML::Node Axis<AxisT, OffsetT>::Serialize() const
     {
         YAML::Node node;
         node["type"] = name_;
         node["axis"] = +axis_;
         node["offset"] = offset_;
-        if (comparer_)
-            node["comparer"] = comparer_;
 
         return node;
     }
 
     template<typename AxisT, typename OffsetT>
-    const char AxisSerializable<AxisT, OffsetT>::name_[] = "axis";
+    const char Axis<AxisT, OffsetT>::name_[] = "axis";
 
     template<typename AxisT, typename OffsetT>
-    void AxisSerializable<AxisT, OffsetT>::Apply(void* ptr) const
+    void Axis<AxisT, OffsetT>::Apply(void* ptr) const
     {
         auto axis = fieldin(ptr, AxisT, offset_);
         (*axis) = axis_;
     }
 
     template<typename AxisT, typename OffsetT>
-    bool AxisSerializable<AxisT, OffsetT>::Applied(const void* ptr) const
+    AxisEvent<AxisT, OffsetT>::AxisEvent(AxisT axis, AxisComparerType compar, OffsetT offset) : axis_(axis), offset_(offset), comparer_(compar) { }
+
+    template<typename AxisT, typename OffsetT>
+    YAML::Node AxisEvent<AxisT, OffsetT>::Serialize() const
+    {
+        YAML::Node node;
+        node["type"] = name_;
+        node["axis"] = +axis_;
+        node["offset"] = offset_;
+        node["comparer"] = comparer_;
+
+        return node;
+    }
+
+    template<typename AxisT, typename OffsetT>
+    bool AxisEvent<AxisT, OffsetT>::Applied(const void* ptr) const
     {
         auto axis = fieldin(ptr, const AxisT, offset_);
         return comparer_(*axis, axis_);
     }
+
+    template<typename AxisT, typename OffsetT>
+    const char AxisEvent<AxisT, OffsetT>::name_[] = "axis";
 
     template<typename OffsetT, typename StickT>
     LinearConverter<OffsetT, StickT>::LinearConverter() : LinearConverter((OffsetT)0, 0, 0) { }
@@ -130,23 +131,26 @@ namespace ControllerInterface
 namespace YAML
 {
     template<typename T>
-    Node convert<ControllerInterface::AxisComparer<T>>::encode(const ControllerInterface::AxisComparer<T>& me)
-    {
-        return me.Serialize();
-    }
-
-    template<typename T>
     bool convert<ControllerInterface::AxisComparer<T>>::decode(const Node& node, ControllerInterface::AxisComparer<T>& val)
     {
-        if (!node.IsScalar())
-            return false;
-
-        auto name = node.as<std::string>();
-        return Serialization::EnumSerializer<ControllerInterface::AxisComparerType>::Decode(axisComparerNames, node, val);
+        auto type = node.as<ControllerInterface::AxisComparerType>();
+        val = ControllerInterface::AxisComparer<T>(type);
     }
 
     template<typename T>
-    Node convert<ControllerInterface::IPressablePtr<T>>::encode(const ControllerInterface::IPressablePtr<T>& me)
+    Node convert<ControllerInterface::AxisComparer<T>>::encode(const ControllerInterface::AxisComparer<T>& val)
+    {
+        return val.Serialize();
+    }
+
+    template<typename T>
+    Node convert<ControllerInterface::IEventPtr<T>>::encode(const ControllerInterface::IEventPtr<T>& me)
+    {
+        return me->Serialize();
+    }
+
+    template<typename T>
+    Node convert<ControllerInterface::IModifierPtr<T>>::encode(const ControllerInterface::IModifierPtr<T>& me)
     {
         return me->Serialize();
     }

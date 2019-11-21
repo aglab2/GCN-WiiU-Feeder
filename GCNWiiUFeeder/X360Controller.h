@@ -10,8 +10,9 @@
 namespace X360
 {
     using Controller = XUSB_REPORT;
-    using IPressable = ControllerInterface::IPressable<Controller>;
-    using IPressablePtr = std::shared_ptr<IPressable>;
+
+    using IModifier = ControllerInterface::IModifier<Controller>;
+    using IModifierPtr = ControllerInterface::IModifierPtr<Controller>;
 
     // Must represent the offsets in buttons
     enum Buttons : USHORT
@@ -47,30 +48,28 @@ namespace X360
         RightTrigger = offsetof(Controller, bRightTrigger),
     };
 
-    using IButton = ControllerInterface::ButtonSerializable<Buttons, USHORT>;
-    class Button final : public IPressable
+    using IButton = ControllerInterface::Button<Buttons, USHORT>;
+    class Button final : public IModifier
                        , public IButton
     {
 
     public:
         Button(Buttons);
 
-        virtual void Press(Controller&) const override;
-        virtual bool Pressed(const Controller&) const override;
+        virtual void Alter(Controller&) const override;
     };
 
     template<typename AxisT, typename OffsetT>
-    using IAxis = ControllerInterface::AxisSerializable<AxisT, OffsetT>;
+    using IAxis = ControllerInterface::Axis<AxisT, OffsetT>;
     
     template<typename AxisT, typename OffsetT>
-    class Axis : public IPressable
+    class Axis : public IModifier
                , public IAxis<AxisT, OffsetT>
     {
     public:
         Axis(IAxis<AxisT, OffsetT> me);
 
-        virtual void Press(Controller&) const override;
-        virtual bool Pressed(const Controller&) const override;
+        virtual void Alter(Controller&) const override;
     };
 
     class Thumb final : public Axis<SHORT, Thumbs>
@@ -136,10 +135,10 @@ namespace YAML
     };
 
     template<>
-    struct convert<X360::IPressablePtr>
+    struct convert<X360::IModifierPtr>
     {
-        static Node encode(const X360::IPressablePtr&);
-        static bool decode(const Node& node, X360::IPressablePtr&);
+        static Node encode(const X360::IModifierPtr&);
+        static bool decode(const Node& node, X360::IModifierPtr&);
     };
 
     template<>

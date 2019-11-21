@@ -38,8 +38,8 @@ namespace Debug
         std::make_shared<Digital::Mapper>(GCN_BUTTON(R), X360_BUTTON(R)),
         std::make_shared<Digital::Mapper>(GCN_BUTTON(L), X360_BUTTON(L)),
 
-        std::make_shared<Digital::Mapper>(std::make_shared<GCN::Axis>(GCN::Axises::RightTrigger, 120), X360_BUTTON(R)),
-        std::make_shared<Digital::Mapper>(std::make_shared<GCN::Axis>(GCN::Axises::LeftTrigger,  120), X360_BUTTON(L)),
+        std::make_shared<Digital::Mapper>(std::make_shared<GCN::Axis>(GCN::Axises::RightTrigger, ControllerInterface::AxisComparerType::More, 120), X360_BUTTON(R)),
+        std::make_shared<Digital::Mapper>(std::make_shared<GCN::Axis>(GCN::Axises::LeftTrigger,  ControllerInterface::AxisComparerType::More, 120), X360_BUTTON(L)),
 
         std::make_shared<Analog::BilinearStickMapper>(GCN::LinearConverter(GCN::Axises::AnalogX, 126, 109), GCN::LinearConverter(GCN::Axises::AnalogY, 134, 109)
                                                     , X360::ThumbsConverter(X360::Thumbs::LeftX, 0, 32000), X360::ThumbsConverter(X360::Thumbs::LeftY, 0, 32000)

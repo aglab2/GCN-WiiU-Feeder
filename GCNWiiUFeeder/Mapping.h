@@ -82,14 +82,14 @@ namespace Mapping
         class Mapper : public IMapper
         {
         public:
-            Mapper(GCN::IPressablePtr from, X360::IPressablePtr to);
+            Mapper(GCN::IEventPtr from, X360::IModifierPtr to);
 
             virtual void Map(const GCN::Controller& from, X360::Controller& to);
             virtual YAML::Node Serialize() const;
 
         private:
-            GCN::IPressablePtr fromButton_;
-            X360::IPressablePtr toButton_;
+            GCN::IEventPtr event_;
+            X360::IModifierPtr modifier;
         };
 
         using MapperPtr = std::shared_ptr<Mapper>;

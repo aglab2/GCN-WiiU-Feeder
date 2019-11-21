@@ -31,6 +31,7 @@ BOOL WINAPI CtrlHandler(DWORD event)
 enum FeederErrors
 {
     FE_OK = 0,
+    FE_CONFIG_INVALID,
     FE_CONFIG_READ,
     FE_CONFIG_PARSE,
     FE_EMU_LIB,
@@ -41,7 +42,7 @@ enum FeederErrors
 static void die(FeederErrors err, const char* why)
 {
     printf("%s\n", why);
-    getchar();
+    while (0xA != getchar());
     exit(err);
 }
 
@@ -63,16 +64,28 @@ int main()
             cfgPaths.push_back(entry.path());
     }
 
+    if (cfgPaths.empty())
+        die(FE_CONFIG_INVALID, "No config files detected!");
+
     printf("Pick config file\n");
     for (int i = 0; i < cfgPaths.size(); i++)
     {
         auto& cfgPath = cfgPaths[i];
-        wprintf(L"%d) %s\n", i, cfgPath.filename().c_str());
+        wprintf(L"%d) %s\n", i + 1, cfgPath.filename().stem().c_str());
     }
 
-    int cfgId;
-    scanf_s("%d", &cfgId);
-    auto cfgPath = cfgPaths[cfgId];
+    long cfgId = -1;
+    do
+    {
+        printf("Enter config file NUMBER (from 1 to %ld): \n", cfgPaths.size());
+        const char cfgIdStr[10] = {};
+        scanf_s("%9s", cfgIdStr, (unsigned)_countof(cfgIdStr));
+
+        cfgId = strtol(cfgIdStr, nullptr, 10);
+    } 
+    while (cfgId <= 0 || cfgId > cfgPaths.size());
+
+    auto cfgPath = cfgPaths[cfgId - 1];
 
     YAML::Node node;
     try

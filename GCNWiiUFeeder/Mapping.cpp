@@ -9,19 +9,19 @@ namespace Mapping
 {
     namespace Digital
     {
-        Mapper::Mapper(GCN::IPressablePtr from, X360::IPressablePtr to) : fromButton_(from), toButton_(to) { }
+        Mapper::Mapper(GCN::IEventPtr from, X360::IModifierPtr to) : event_(from), modifier(to) { }
 
         void Mapper::Map(const GCN::Controller& from, X360::Controller& to)
         {
-            if (fromButton_->Pressed(from))
-                toButton_->Press(to);
+            if (event_->Happened(from))
+                modifier->Alter(to);
         }
 
         YAML::Node Mapper::Serialize() const
         {
             YAML::Node node;
-            node["from"] = fromButton_;
-            node["to"] = toButton_;
+            node["from"] = event_;
+            node["to"] = modifier;
             return node;
         }
     }
@@ -102,10 +102,10 @@ namespace YAML
         if (!fromNode || !toNode)
             return false;
 
-        auto fromButton = fromNode.as<GCN::IPressablePtr>();
-        auto toButton = toNode.as<X360::IPressablePtr>();
+        auto event = fromNode.as<GCN::IEventPtr>();
+        auto modifier = toNode.as<X360::IModifierPtr>();
 
-        mapper = std::make_shared<Mapping::Digital::Mapper>(fromButton, toButton);
+        mapper = std::make_shared<Mapping::Digital::Mapper>(event, modifier);
         return true;
     }
 }

@@ -39,8 +39,8 @@ namespace GCN
     };
 #pragma pack(pop)
 
-    using IPressable = ControllerInterface::IPressable<Controller>;
-    using IPressablePtr = std::shared_ptr<IPressable>;
+    using IEvent = ControllerInterface::IEvent<Controller>;
+    using IEventPtr = ControllerInterface::IEventPtr<Controller>;
 
     enum Buttons : unsigned short
     {
@@ -72,26 +72,24 @@ namespace GCN
 
     YAML::Emitter& operator<<(YAML::Emitter&, enum Axises);
 
-    using IButton = ControllerInterface::ButtonSerializable<Buttons, unsigned short>;
-    class Button final : public IPressable
+    using IButton = ControllerInterface::Button<Buttons, unsigned short>;
+    class Button final : public IEvent
                        , public IButton
     {
     public:
         Button(Buttons);
 
-        virtual void Press(Controller&) const override;
-        virtual bool Pressed(const Controller&) const override;
+        virtual bool Happened(const Controller&) const;
     };
 
-    using IAxis = ControllerInterface::AxisSerializable<unsigned char, Axises>;
-    struct Axis final : public IPressable
+    using IAxis = ControllerInterface::AxisEvent<unsigned char, Axises>;
+    struct Axis final : public IEvent
                       , public IAxis
     {
     public:
-        Axis(Axises, unsigned char value);
+        Axis(Axises, ControllerInterface::AxisComparerType type, unsigned char value);
 
-        virtual void Press(Controller&) const override;
-        virtual bool Pressed(const Controller&) const override;
+        virtual bool Happened(const Controller&) const;
     };
 
     using LinearConverter = ControllerInterface::LinearConverter<GCN::Axises, unsigned char>;
@@ -122,9 +120,9 @@ namespace YAML
     };
 
     template<>
-    struct convert<GCN::IPressablePtr>
+    struct convert<GCN::IEventPtr>
     {
-        static Node encode(const GCN::IPressablePtr&);
-        static bool decode(const Node& node, GCN::IPressablePtr&);
+        static Node encode(const GCN::IEventPtr&);
+        static bool decode(const Node& node, GCN::IEventPtr&);
     };
 }

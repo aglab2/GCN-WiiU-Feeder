@@ -84,12 +84,12 @@ namespace YAML
         return Serializer::DecodeBitWise(names, node, thumb);
     }
 
-    Node convert<X360::IPressablePtr>::encode(const X360::IPressablePtr& ptr)
+    Node convert<X360::IModifierPtr>::encode(const X360::IModifierPtr& ptr)
     {
         return ptr->Serialize();
     }
 
-    bool convert<X360::IPressablePtr>::decode(const Node& node, X360::IPressablePtr& ptr)
+    bool convert<X360::IModifierPtr>::decode(const Node& node, X360::IModifierPtr& ptr)
     {
         if (node.IsScalar() || node.IsSequence())
         {
@@ -178,33 +178,22 @@ namespace X360
 {
     Button::Button(Buttons button) : IButton(button) { }
 
-    void Button::Press(Controller& c) const
+    void Button::Alter(Controller& c) const
     {
         Apply(c.wButtons);
-    }
-
-    bool Button::Pressed(const Controller& c) const
-    {
-        return Applied(c.wButtons);
     }
 
     template<typename AxisT, typename OffsetT>
     Axis<AxisT, OffsetT>::Axis(IAxis<AxisT, OffsetT> me) : IAxis<AxisT, OffsetT>(me) { }
 
     template<typename AxisT, typename OffsetT>
-    void Axis<AxisT, OffsetT>::Press(Controller& c) const
+    void Axis<AxisT, OffsetT>::Alter(Controller& c) const
     {
         return IAxis<AxisT, OffsetT>::Apply(&c);
     }
 
-    template<typename AxisT, typename OffsetT>
-    bool Axis<AxisT, OffsetT>::Pressed(const Controller& c) const
-    {
-        return IAxis<AxisT, OffsetT>::Applied(&c);
-    }
-
     // TODO: Stupid!
-    Thumb::Thumb(Thumbs thumb, SHORT value) : Axis(Intf(value, value > 0 ? ControllerInterface::AxisComparerType::More : ControllerInterface::AxisComparerType::Less, thumb)) { }
+    Thumb::Thumb(Thumbs thumb, SHORT value) : Axis(Intf(value,  thumb)) { }
 
-    Trigger::Trigger(Triggers trigger, BYTE value) : Axis(Intf(value, ControllerInterface::AxisComparerType::More, trigger)) { }
+    Trigger::Trigger(Triggers trigger, BYTE value) : Axis(Intf(value, trigger)) { }
 }

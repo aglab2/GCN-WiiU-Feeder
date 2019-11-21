@@ -1,6 +1,8 @@
 #include "ControllerInterface.h"
 
-#include "yaml-cpp/yaml.h"
+#include <yaml-cpp/yaml.h>
+
+#include "SerializationImpl.h"
 
 namespace ControllerInterface
 {
@@ -49,6 +51,21 @@ namespace ControllerInterface
 
 namespace YAML
 {
+    const std::map<std::string, ControllerInterface::AxisComparerType> convert<ControllerInterface::AxisComparerType>::names{
+        { "More", ControllerInterface::AxisComparerType::More },
+        { "Less", ControllerInterface::AxisComparerType::Less },
+    };
+
+    Node convert<ControllerInterface::AxisComparerType>::encode(const ControllerInterface::AxisComparerType& t)
+    {
+        return Serialization::EnumSerializer<ControllerInterface::AxisComparerType>::Encode(names, t);
+    }
+
+    bool convert<ControllerInterface::AxisComparerType>::decode(const Node& node, ControllerInterface::AxisComparerType& t)
+    {
+        return Serialization::EnumSerializer<ControllerInterface::AxisComparerType>::Decode(names, node, t);
+    }
+
     Node convert<ControllerInterface::BilinearDiagonalStretcher>::encode(const ControllerInterface::BilinearDiagonalStretcher& me)
     {
         return me.Serialize();

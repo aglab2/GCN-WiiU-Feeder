@@ -16,10 +16,10 @@ namespace ControllerInterface
 {
     // HolderT is base of ButtonT enum
     template<typename ButtonT, typename HolderT>
-    class ButtonSerializable : public virtual Serialization::ISerializable
+    class Button : public virtual Serialization::ISerializable
     {
     public:
-        ButtonSerializable(ButtonT button);
+        Button(ButtonT button);
 
         virtual YAML::Node Serialize() const override;
 
@@ -32,7 +32,6 @@ namespace ControllerInterface
 
     enum AxisComparerType
     {
-        None,
         Less,
         More,
     };
@@ -44,44 +43,65 @@ namespace ControllerInterface
         using Type = AxisComparerType;
         AxisComparer(Type t);
 
-        operator bool() const;
-        
-        bool operator()(const T a, const T b) const;
         virtual YAML::Node Serialize() const override;
+
+        bool operator()(const T a, const T b) const;
 
     private:
         const Type type_;
     };
-   
+
     // OffsetT must have size_t as a Base
     template<typename AxisT, typename OffsetT>
-    class AxisSerializable : public virtual Serialization::ISerializable
+    class Axis : public virtual Serialization::ISerializable
     {
     public:
-        AxisSerializable(AxisT axis, AxisComparerType compar, OffsetT offset);
+        Axis(AxisT axis, OffsetT offset);
         virtual YAML::Node Serialize() const override;
 
-        void Apply  (void* ptr) const;
+        void Apply(void* ptr) const;
+
+    private:
+        static const char name_[];
+        AxisT axis_;
+        OffsetT offset_;
+    };
+
+    template<typename AxisT, typename OffsetT>
+    class AxisEvent : public virtual Serialization::ISerializable
+    {
+    public:
+        AxisEvent(AxisT axis, AxisComparerType compar, OffsetT offset);
+        virtual YAML::Node Serialize() const override;
+
         bool Applied(const void* ptr) const;
 
     private:
         static const char name_[];
-
         AxisT axis_;
-        AxisComparer<AxisT> comparer_;
         OffsetT offset_;
+        AxisComparer<AxisT> comparer_;
     };
 
     template<typename ControllerT>
-    class IPressable : public virtual Serialization::ISerializable
+    class IEvent : public virtual Serialization::ISerializable
     {
     public:
-        virtual void Press(ControllerT&) const = 0;
-        virtual bool Pressed(const ControllerT&) const = 0;
+        virtual bool Happened(const ControllerT&) const = 0;
     };
 
     template<typename ControllerT>
-    using IPressablePtr = std::shared_ptr<IPressable<ControllerT>>;
+    class IModifier : public virtual Serialization::ISerializable
+    {
+    public:
+        virtual void Alter(ControllerT&) const = 0;
+    };
+
+    template<typename ControllerT>
+    using IEventPtr = std::shared_ptr<IEvent<ControllerT>>;
+
+    template<typename ControllerT>
+    using IModifierPtr = std::shared_ptr<IModifier<ControllerT>>;
 
     // Converter from anything to [-1; 1] floating point axis
     template<typename OffsetT, typename StickT>
@@ -127,6 +147,15 @@ namespace ControllerInterface
 
 namespace YAML
 {
+    template<>
+    struct convert<ControllerInterface::AxisComparerType>
+    {
+        static const std::map<std::string, ControllerInterface::AxisComparerType> names;
+
+        static Node encode(const ControllerInterface::AxisComparerType&);
+        static bool decode(const Node& node, ControllerInterface::AxisComparerType&);
+    };
+
     template<typename T>
     struct convert<ControllerInterface::AxisComparer<T>>
     {
@@ -135,9 +164,15 @@ namespace YAML
     };
 
     template<typename T>
-    struct convert<ControllerInterface::IPressablePtr<T>>
+    struct convert<ControllerInterface::IEventPtr<T>>
     {
-        static Node encode(const ControllerInterface::IPressablePtr<T>&);
+        static Node encode(const ControllerInterface::IEventPtr<T>&);
+    };
+
+    template<typename T>
+    struct convert<ControllerInterface::IModifierPtr<T>>
+    {
+        static Node encode(const ControllerInterface::IModifierPtr<T>&);
     };
 
     template<typename T, typename S>
