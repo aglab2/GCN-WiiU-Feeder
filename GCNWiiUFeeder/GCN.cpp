@@ -27,7 +27,7 @@ namespace GCN
 
     bool Adapter::Read(Inputs& buf)
     {
-        return Usb::Device::ReadInterrupt((unsigned char*)&buf, sizeof(Inputs), 100);
+        return Usb::Device::ReadInterrupt((unsigned char*)&buf, sizeof(Inputs), 1000);
     }
 
     bool Adapter::Write(Control& ctl)

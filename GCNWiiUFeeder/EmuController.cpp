@@ -54,6 +54,7 @@ namespace Emu
             return true;
 
         vigem_target_remove(*Lib, Target);
+        IsConnected = false;
         return IsConnected;
     }
 

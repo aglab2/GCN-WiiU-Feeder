@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <optional>
 
 namespace YAML
 {
@@ -109,7 +110,7 @@ namespace ControllerInterface
     {
     public:
         LinearConverter();
-        LinearConverter(OffsetT offset, StickT center, StickT max);
+        LinearConverter(OffsetT offset, std::optional<StickT> center, StickT max);
 
         StickT* Get(void* ptr) const { return fieldin(ptr, StickT, offset_); }
         const StickT* Get(const void* ptr) const { return fieldin(ptr, const StickT, offset_); }
@@ -123,7 +124,7 @@ namespace ControllerInterface
         virtual YAML::Node Serialize() const override;
 
         OffsetT offset_;
-        StickT center_;
+        mutable std::optional<StickT> center_;
         StickT maxval_;
     };
 

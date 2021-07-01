@@ -102,26 +102,34 @@ namespace ControllerInterface
     LinearConverter<OffsetT, StickT>::LinearConverter() : LinearConverter((OffsetT)0, 0, 0) { }
 
     template<typename OffsetT, typename StickT>
-    LinearConverter<OffsetT, StickT>::LinearConverter(OffsetT offset, StickT center, StickT max)
-        : offset_(offset), center_(center), maxval_(max) { }
+    LinearConverter<OffsetT, StickT>::LinearConverter(OffsetT offset, std::optional<StickT> center, StickT max)
+        : offset_(offset), center_(std::move(center)), maxval_(max) { }
 
     template<typename OffsetT, typename StickT>
     float LinearConverter<OffsetT, StickT>::Convert(StickT value) const
     {
-        return (float)(value - center_) / (float)maxval_;
+        if (!center_)
+            center_ = value;
+
+        return (float)(value - *center_) / (float)maxval_;
     }
 
     template<typename OffsetT, typename StickT>
     StickT LinearConverter<OffsetT, StickT>::Convert(float value) const
     {
-        return (StickT)((value + center_) * maxval_);
+        if (!center_)
+            center_ = value;
+
+        return (StickT)((value + *center_) * maxval_);
     }
 
     template<typename OffsetT, typename StickT>
     YAML::Node LinearConverter<OffsetT, StickT>::Serialize() const
     {
         YAML::Node node;
-        node["center"] = +center_;
+        if (center_)
+            node["center"] = +(*center_);
+    
         node["max"] = +maxval_;
         node["offset"] = offset_;
         return node;
@@ -171,10 +179,13 @@ namespace YAML
         auto maxNode = node["max"];
         auto offsetNode = node["offset"];
 
-        if (!centerNode || !maxNode || !offsetNode)
+        if (!maxNode || !offsetNode)
             return false;
 
-        auto center = (StickT) centerNode.as<int>();
+        std::optional<StickT> center;
+        if (centerNode)
+            center = (StickT)centerNode.as<int>();
+
         auto maxval = (StickT) maxNode.as<int>();
         auto offset = offsetNode.as<OffsetT>();
 

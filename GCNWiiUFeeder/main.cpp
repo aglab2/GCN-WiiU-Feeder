@@ -77,7 +77,7 @@ int main()
     long cfgId = -1;
     do
     {
-        printf("Enter config file NUMBER (from 1 to %ld): \n", cfgPaths.size());
+        printf("Enter config file NUMBER (from 1 to %lld): \n", cfgPaths.size());
         const char cfgIdStr[10] = {};
         scanf_s("%9s", cfgIdStr, (unsigned)_countof(cfgIdStr));
 
@@ -141,7 +141,7 @@ int main()
         if (!adapter.Read(inputs))
             continue;
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i <= 3; i++)
         {
             GCN::Controller& controller = inputs.Controllers[i];
             if (emuControllersPlugged[i] != controller.On)
