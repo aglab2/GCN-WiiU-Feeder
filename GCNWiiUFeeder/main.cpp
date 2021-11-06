@@ -135,12 +135,15 @@ int main()
     char emuControllersPlugged[4] = {};
 
     printf("Feeder is running!\n");
+    GCN::Adapter::Inputs inputs;
+    if (!adapter.Read(inputs))
+    {
+        adapter.Stop();
+        return 1;
+    }
+    
     while (Running)
     {
-        GCN::Adapter::Inputs inputs;
-        if (!adapter.Read(inputs))
-            continue;
-
         for (int i = 0; i <= 3; i++)
         {
             GCN::Controller& controller = inputs.Controllers[i];
@@ -169,6 +172,12 @@ int main()
             X360::Controller emuControllersInputs = {};
             Mapping::Map(mappers, controller, emuControllersInputs);
             emuControllers[i].Update(emuControllersInputs);
+        }
+
+        while (Running)
+        {
+            if (adapter.ReadInterrupt(inputs))
+                break;
         }
     }
 

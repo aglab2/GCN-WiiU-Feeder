@@ -44,22 +44,16 @@
   
 # This is diagonal stretching to emulate N64 controller, read more at https://electromodder.co.uk/
 - type: bilinear
-  # Normal GC Stick has center(127, 127), max(106, 106) but my stick sucks so I have to alter the values
-  # My GC Stick center(126, 134) max(109, 109)
   fromX:
-    center: 126
     max: 109
     offset: AnalogX
   fromY:
-    center: 134
     max: 109
     offset: AnalogY
   toX:
-    center: 0
     max: 32000
     offset: LeftX
   toY:
-    center: 0
     max: 32000
     offset: LeftY
   stretcher:
@@ -74,20 +68,16 @@
 # Regular mappings for CStick, may use similar
 - type: linear
   from:
-    center: 120
     max: 100
     offset: CStickX
   to:
-    center: 0
     max: 32000
     offset: RightX
 - type: linear
   from:
-    center: 126
     max: 100
     offset: CStickY
   to:
-    center: 0
     max: 32000
     offset: RightY
 

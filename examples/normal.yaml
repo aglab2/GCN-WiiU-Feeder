@@ -30,59 +30,47 @@
 # Mapping for Triggers, 1:1 from GC to X360
 - type: linear
   from:
-    center: 0
     max: 200
     offset: LeftTrigger
   to:
-    center: 0
     max: 200
     offset: LeftTrigger
 - type: linear
   from:
-    center: 0
     max: 200
     offset: RightTrigger
   to:
-    center: 0
     max: 200
     offset: RightTrigger
 
 # Mappings for Stick
 - type: linear
   from:
-    center: 127
     max: 107
     offset: AnalogX
   to:
-    center: 0
     max: 32000
     offset: LeftX
 - type: linear
   from:
-    center: 127
     max: 107
     offset: AnalogY
   to:
-    center: 0
     max: 32000
     offset: LeftY
 
 # Mappings for CStick
 - type: linear
   from:
-    center: 127
     max: 100
     offset: CStickX
   to:
-    center: 0
     max: 32000
     offset: RightX
 - type: linear
   from:
-    center: 127
     max: 100
     offset: CStickY
   to:
-    center: 0
     max: 32000
     offset: RightY

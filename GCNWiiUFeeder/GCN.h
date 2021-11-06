@@ -27,6 +27,7 @@ namespace GCN
         bool Start();
         bool Stop();
         bool Read(Inputs&);
+        bool ReadInterrupt(Inputs&);
         bool Write(Control&);
 
         inline bool Usable() { return Usb::Device::Usable(); }
