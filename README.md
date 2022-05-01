@@ -16,10 +16,10 @@ This Feeder was inspired by the vJoy implementation by m4sv and uses the same ap
 * yaml-cpp 0.6.3
 
 # How to install and run?
-* Install ViGEm Driver https://github.com/ViGEm/ViGEmBus/releases/download/v1.16.112/ViGEmBus_Setup_1.16.115.exe
+* Install ViGEm Driver https://github.com/ViGEm/ViGEmBus/releases/download/setup-v1.17.333/ViGEmBusSetup_x64.msi
 * Install WiiU Adapter Driver installer (Run with Admin Rights!) https://github.com/aglab2/libwdi/releases/download/wii-u-1.0/WiiUAdapterInstaller.exe
-* Download the feeder GCNWiiUFeeder from https://github.com/aglab2/GCN-WiiU-Feeder/releases/download/0.1/GCNWiiUFeeder-x64.exe
-* Get example.zip config files and extract them to the same folder as executable file is
+* Download the feeder GCNWiiUFeeder from https://github.com/aglab2/GCN-WiiU-Feeder/releases/download/1.1/GCNWiiUFeeder-x64.exe
+* Get https://github.com/aglab2/GCN-WiiU-Feeder/releases/download/1.1/examples.zip config files and extract them to the same folder as executable file is
 * Run the executable with Admin rights and pick normal.yaml config
 * If 'Feeder is running!' appeared, the program has successfully started!
 * Enjoy and Test!
