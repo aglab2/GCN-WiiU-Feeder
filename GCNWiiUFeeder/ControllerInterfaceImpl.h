@@ -3,6 +3,8 @@
 #include "ControllerInterface.h"
 #include "SerializationImpl.h"
 
+#include <algorithm>
+
 namespace ControllerInterface
 {
     template<typename T>
@@ -111,7 +113,7 @@ namespace ControllerInterface
         if (!center_)
             center_ = value;
 
-        return (float)(value - *center_) / (float)maxval_;
+        return std::clamp((float)(value - *center_) / (float)maxval_, -1.f, 1.f);
     }
 
     template<typename OffsetT, typename StickT>
