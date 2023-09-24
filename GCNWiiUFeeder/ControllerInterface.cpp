@@ -33,7 +33,10 @@ namespace ControllerInterface
         float addition = fullMultiplier - 1;
         float dampening = pow(fromAvg, power_);
 
-        float multiplier = 1 + addition * dampening;
+        float multiplier = 1.f + addition * dampening;
+        float maxMultiplier = 1.f / std::max(X, Y);
+        if (multiplier > maxMultiplier)
+            multiplier = maxMultiplier;
 
         x *= multiplier;
         y *= multiplier;
