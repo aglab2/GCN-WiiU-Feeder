@@ -101,11 +101,11 @@ namespace ControllerInterface
     const char AxisEvent<AxisT, OffsetT>::name_[] = "axis";
 
     template<typename OffsetT, typename StickT>
-    LinearConverter<OffsetT, StickT>::LinearConverter() : LinearConverter((OffsetT)0, 0, 0) { }
+    LinearConverter<OffsetT, StickT>::LinearConverter() : LinearConverter((OffsetT)0, 0, 0, 0.f) { }
 
     template<typename OffsetT, typename StickT>
-    LinearConverter<OffsetT, StickT>::LinearConverter(OffsetT offset, std::optional<StickT> center, StickT max)
-        : offset_(offset), center_(std::move(center)), maxval_(max) { }
+    LinearConverter<OffsetT, StickT>::LinearConverter(OffsetT offset, std::optional<StickT> center, StickT max, float deadzone)
+        : offset_(offset), center_(std::move(center)), maxval_(max), deadzone_(deadzone) { }
 
     template<typename OffsetT, typename StickT>
     float LinearConverter<OffsetT, StickT>::Convert(StickT value) const
@@ -113,7 +113,11 @@ namespace ControllerInterface
         if (!center_)
             center_ = value;
 
-        return std::clamp((float)(value - *center_) / (float)maxval_, -1.f, 1.f);
+        float val = std::clamp((float)(value - *center_) / (float)maxval_, -1.f, 1.f);
+        if (fabs(val) < deadzone_)
+            val = 0.f;
+
+        return val;
     }
 
     template<typename OffsetT, typename StickT>
@@ -122,7 +126,11 @@ namespace ControllerInterface
         if (!center_)
             center_ = value;
 
-        return (StickT)((value + *center_) * maxval_);
+        float val = value + *center_;
+        if (fabs(val) < deadzone_)
+			val = 0.f;
+
+        return (StickT)(val * maxval_);
     }
 
     template<typename OffsetT, typename StickT>
@@ -134,6 +142,9 @@ namespace ControllerInterface
     
         node["max"] = +maxval_;
         node["offset"] = offset_;
+        if (deadzone_ < 0.001f)
+            node["deadzone"] = deadzone_;
+
         return node;
     }
 }
@@ -180,6 +191,7 @@ namespace YAML
         auto centerNode = node["center"];
         auto maxNode = node["max"];
         auto offsetNode = node["offset"];
+        auto deadzoneNode = node["deadzone"];
 
         if (!maxNode || !offsetNode)
             return false;
@@ -191,7 +203,11 @@ namespace YAML
         auto maxval = (StickT) maxNode.as<int>();
         auto offset = offsetNode.as<OffsetT>();
 
-        conv = ControllerInterface::LinearConverter<OffsetT, StickT>(offset, center, maxval);
+        float deadzone = 0.f;
+        if (deadzoneNode)
+			deadzone = deadzoneNode.as<float>();
+
+        conv = ControllerInterface::LinearConverter<OffsetT, StickT>(offset, center, maxval, deadzone);
         return true;
     }
 }

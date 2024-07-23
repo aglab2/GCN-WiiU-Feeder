@@ -110,7 +110,7 @@ namespace ControllerInterface
     {
     public:
         LinearConverter();
-        LinearConverter(OffsetT offset, std::optional<StickT> center, StickT max);
+        LinearConverter(OffsetT offset, std::optional<StickT> center, StickT max, float deadzone);
 
         StickT* Get(void* ptr) const { return fieldin(ptr, StickT, offset_); }
         const StickT* Get(const void* ptr) const { return fieldin(ptr, const StickT, offset_); }
@@ -126,6 +126,7 @@ namespace ControllerInterface
         OffsetT offset_;
         mutable std::optional<StickT> center_;
         StickT maxval_;
+        float deadzone_;
     };
 
     // Symmetric axial stretcher
