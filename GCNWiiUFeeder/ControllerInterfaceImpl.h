@@ -156,6 +156,7 @@ namespace YAML
     {
         auto type = node.as<ControllerInterface::AxisComparerType>();
         val = ControllerInterface::AxisComparer<T>(type);
+        return true;
     }
 
     template<typename T>

@@ -1,6 +1,6 @@
 #include "GCN.h"
 #include "EmuController.h"
-#include "Win.h"
+#include "Platform.h"
 
 #include <iostream>
 #include <filesystem>
@@ -16,6 +16,7 @@ static void test()
 #endif
 
 static bool Running = true;
+#ifdef _WIN32
 BOOL WINAPI CtrlHandler(DWORD event)
 {
     if (event == CTRL_CLOSE_EVENT)
@@ -26,6 +27,16 @@ BOOL WINAPI CtrlHandler(DWORD event)
     }
     return FALSE;
 }
+#else
+#include <signal.h>
+void CtrlHandler(int signum)
+{
+    if (signum == SIGINT)
+    {
+        Running = false;
+    }
+}
+#endif
 
 
 enum FeederErrors
@@ -53,7 +64,7 @@ int main()
 #endif
 
     std::vector<std::filesystem::path> cfgPaths;
-    std::filesystem::path exePath(Win::ExecutablePath());
+    std::filesystem::path exePath(Platform::ExecutablePath());
     auto exeDir = exePath.parent_path();
     for (const auto& entry : std::filesystem::directory_iterator(exeDir))
     {
@@ -71,7 +82,7 @@ int main()
     for (int i = 0; i < cfgPaths.size(); i++)
     {
         auto& cfgPath = cfgPaths[i];
-        wprintf(L"%d) %s\n", i + 1, cfgPath.filename().stem().c_str());
+        printf("%d) %s\n", i + 1, cfgPath.filename().stem().c_str());
     }
 
     long cfgId = -1;
@@ -90,7 +101,7 @@ int main()
     YAML::Node node;
     try
     {
-        node = YAML::LoadFile(cfgPath.u8string());
+        node = YAML::LoadFile(cfgPath.string());
     }
     catch (...)
     {
@@ -125,7 +136,12 @@ int main()
     if (!adapter.Start())
         die(FE_ADAPTER, "Failed to start feeding WiiU inputs");
 
+#ifdef _WIN32
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
+#else
+    signal(SIGINT, CtrlHandler);
+    signal(SIGTERM, CtrlHandler);
+#endif
 
     GCN::Adapter::Control ctl = {};
     ctl.Cmd = 0x11;

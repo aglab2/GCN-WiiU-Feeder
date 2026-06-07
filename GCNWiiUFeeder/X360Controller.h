@@ -1,5 +1,9 @@
 #pragma once
+#ifdef _WIN32
 #include <Windows.h>
+#else
+#include <ViGEmLinux/Compat.h>
+#endif
 #include <ViGEm/Common.h>
 #include <yaml-cpp/yaml.h>
 

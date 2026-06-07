@@ -93,8 +93,8 @@ namespace YAML
         if (!fromNode || !toNode)
             return false;
         
-        auto from = fromNode.as<Mapping::Analog::LinearMapper<FromOffsetT, FromStickT, ToOffsetT, ToStickT>::FromConverter>();
-        auto to = toNode.as<Mapping::Analog::LinearMapper<FromOffsetT, FromStickT, ToOffsetT, ToStickT>::ToConverter>();
+        auto from = fromNode.as<typename Mapping::Analog::LinearMapper<FromOffsetT, FromStickT, ToOffsetT, ToStickT>::FromConverter>();
+        auto to = toNode.as<typename Mapping::Analog::LinearMapper<FromOffsetT, FromStickT, ToOffsetT, ToStickT>::ToConverter>();
 
         mapper = std::make_shared<Mapping::Analog::LinearMapper<FromOffsetT, FromStickT, ToOffsetT, ToStickT>>(from, to);
         return true;

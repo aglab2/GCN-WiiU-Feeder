@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include <ViGEmLinux/Compat.h>
+#endif
 #include <ViGEm/Client.h>
 #include "X360Controller.h"
 
@@ -37,7 +41,7 @@ namespace Emu
         inline bool Usable() { return Target != nullptr; }
         inline bool Connected() { return IsConnected; }
     private:
-        Lib& Lib;
+        Lib& TheLib;
         PVIGEM_TARGET Target;
         bool IsConnected;
     };

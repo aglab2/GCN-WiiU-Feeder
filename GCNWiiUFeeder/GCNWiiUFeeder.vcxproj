@@ -193,7 +193,7 @@
     <ClCompile Include="Serialization.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="Usb.cpp" />
-    <ClCompile Include="Win.cpp" />
+    <ClCompile Include="PlatformWin.cpp" />
     <ClCompile Include="X360Controller.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -207,7 +207,7 @@
     <ClInclude Include="debug.h" />
     <ClInclude Include="Usb.h" />
     <ClInclude Include="utils.h" />
-    <ClInclude Include="Win.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="X360Controller.h" />
   </ItemGroup>
   <ItemGroup>

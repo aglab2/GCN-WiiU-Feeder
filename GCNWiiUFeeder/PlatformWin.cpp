@@ -1,8 +1,8 @@
-#include "Win.h"
+#include "Platform.h"
 
 #include <Windows.h>
 
-namespace Win
+namespace Platform
 {
     std::wstring ExecutablePath()
     {

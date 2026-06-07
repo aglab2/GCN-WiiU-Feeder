@@ -25,7 +25,7 @@ namespace Emu
     }
 
     Device::Device(class Lib& lib)
-        : Lib(lib)
+        : TheLib(lib)
         , Target(vigem_target_x360_alloc())
         , IsConnected(false)
     { }
@@ -44,7 +44,7 @@ namespace Emu
         if (IsConnected)
             return true;
 
-        IsConnected = VIGEM_SUCCESS(vigem_target_add(*Lib, Target));
+        IsConnected = VIGEM_SUCCESS(vigem_target_add(*TheLib, Target));
         return IsConnected;
     }
 
@@ -53,13 +53,13 @@ namespace Emu
         if (!IsConnected)
             return true;
 
-        vigem_target_remove(*Lib, Target);
+        vigem_target_remove(*TheLib, Target);
         IsConnected = false;
         return IsConnected;
     }
 
     bool Device::Update(X360::Controller& c)
     {
-        return VIGEM_SUCCESS(vigem_target_x360_update(*Lib, Target, c));
+        return VIGEM_SUCCESS(vigem_target_x360_update(*TheLib, Target, c));
     }
 }
