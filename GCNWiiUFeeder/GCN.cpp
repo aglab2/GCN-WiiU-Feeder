@@ -13,8 +13,7 @@ namespace GCN
 
     bool Adapter::Start()
     {
-        if (!ClaimInterface(0))
-            return false;
+        ClaimInterface(0);
 
         unsigned char data = 19;
         return Usb::Device::Write(&data, 1);

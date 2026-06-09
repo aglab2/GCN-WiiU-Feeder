@@ -29,7 +29,7 @@ namespace Usb
         inline bool Usable() { return DeviceHandle != nullptr; }
         inline libusb_device_handle* operator*() { return DeviceHandle; }
 
-        bool ClaimInterface(int intf);
+        void ClaimInterface(int intf);
         bool ReleaseInterface();
 
         void SetEndpoints(unsigned char read, unsigned char write);

@@ -1,5 +1,8 @@
 #include "Usb.h"
 
+#include <stdio.h>
+#include <unistd.h>
+
 namespace Usb
 {
     Lib::Lib()
@@ -30,16 +33,37 @@ namespace Usb
             libusb_close(DeviceHandle);
     }
 
-    bool Device::ClaimInterface(int intf)
+    void Device::ClaimInterface(int intf)
     {
         if (IsInterfaceAcquired)
-            return false;
+        {
+            printf("Interface already claimed\n");
+            return;
+        }
 
-        int err = libusb_claim_interface(DeviceHandle, intf);
-        if (!err)
-            IsInterfaceAcquired = true;
+        while (!IsInterfaceAcquired)
+        {
+            int err = libusb_claim_interface(DeviceHandle, intf);
+            if (!err)
+            {
+                IsInterfaceAcquired = true;
+                break;
+            }
 
-        return !err;
+            if (libusb_kernel_driver_active(DeviceHandle, 0) == 1)
+            {
+                printf("Kernel driver active. Detaching...\n");
+                if (libusb_detach_kernel_driver(DeviceHandle, 0) == 0)
+                {
+                    printf("Kernel driver detached successfully.\n");
+                }
+            }
+            else
+            {
+                printf("Claiming interface %d failed with error %d, retrying...\n", intf, err);
+                sleep(1);
+            }
+        }
     }
 
     bool Device::ReleaseInterface()
