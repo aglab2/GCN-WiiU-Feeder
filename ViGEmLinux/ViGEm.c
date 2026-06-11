@@ -131,6 +131,9 @@ VIGEM_ERROR vigem_target_x360_update(
     PVIGEM_TARGET target,
     XUSB_REPORT report)
 {
+    report.sThumbLY = -1-report.sThumbLY;
+    report.sThumbRY = -1-report.sThumbRY;
+
     struct input_event ev[24];
 
     int counter = 0;

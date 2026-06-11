@@ -18,7 +18,7 @@ typedef bool BOOL;
 typedef LONG* PLONG;
 typedef ULONG* PULONG;
 
-#define FORCEINLINE inline
+#define FORCEINLINE static inline
 #define _Out_
 #define _In_
 #define _Function_class_(x)
